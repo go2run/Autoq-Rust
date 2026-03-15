@@ -1,0 +1,36 @@
+[workspace]
+members = [
+    "crates/autoq-core",
+    "crates/autoq-parser",
+    "crates/autoq-z3",
+    "crates/autoq-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+
+[workspace.dependencies]
+# Arbitrary-precision arithmetic (replaces boost::multiprecision::cpp_int)
+num-bigint = "0.4"
+num-traits = "0.2"
+num-integer = "0.1"
+num-rational = "0.4"
+
+# PEG parser (replaces ANTLR4 runtime)
+pest = "2"
+pest_derive = "2"
+
+# CLI (replaces CLI11)
+clap = { version = "4", features = ["derive"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Internal crates
+autoq-core = { path = "crates/autoq-core" }
+autoq-parser = { path = "crates/autoq-parser" }
+autoq-z3 = { path = "crates/autoq-z3" }

@@ -1,0 +1,15 @@
+[package]
+name = "autoq-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "autoq"
+path = "src/main.rs"
+
+[dependencies]
+autoq-core = { workspace = true }
+autoq-parser = { workspace = true }
+autoq-z3 = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
