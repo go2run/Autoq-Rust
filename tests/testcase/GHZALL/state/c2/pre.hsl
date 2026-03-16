@@ -1,0 +1,7 @@
+Constants
+c0 := 1
+Extended Dirac
+\/ |i|=6 : c0 |00i>
+\/ |i|=6 : c0 |01i>
+\/ |i|=6 : c0 |10i>
+\/ |i|=6 : c0 |11i>

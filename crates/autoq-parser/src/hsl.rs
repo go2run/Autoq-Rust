@@ -519,7 +519,7 @@ Extended Dirac
     #[test]
     fn parse_fixture_groverfor_pre() {
         let input = std::fs::read_to_string(
-            concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/fixtures/hsl/groverfor_pre.hsl")
+            concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/testcase/GroverFor/pre.hsl")
         ).expect("fixture not found");
         let aut = parse_and_build(&input).expect("parse+build failed");
         assert_eq!(aut.qubit_num, 5);

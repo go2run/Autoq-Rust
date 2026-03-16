@@ -89,10 +89,18 @@ Prior Rust prototype: `/home/user/AutoQ/rust_proto/` (8-crate workspace)
 | `inline static` globals | Explicit parameters or `thread_local!` | No hidden global state |
 
 ## Test Data
-Test fixtures in `tests/fixtures/` are copied from AutoQ's unit test cases:
-- `hsl/`: HSL specification files (pre/post conditions)
-- `qasm/`: OpenQASM circuit files
-- `lsta/`: Timbuk-format automata serializations
+All test data from the C++ AutoQ repo has been copied into `tests/`:
+- `testcase/`: Full unit test cases from `AutoQ/unit_tests/testcase/`
+  - `BVALL/`, `GHZALL/`, `OEGROVER/`, `GroverFor/`: algorithm-specific test cases (circuit.qasm + pre/post.hsl per state)
+  - `spec_hsl/HSL/`: HSL sample files (sample0–3.hsl)
+  - `spec_hsl/SPEC/`: corresponding LSTA spec files (sample0–3.lsta)
+  - `pre.lsta`, `post.lsta`, `sample.qasm`: standalone test files
+- `reference_answers/`: Expected output automata from `AutoQ/unit_tests/reference_answers/`
+  - `Bernstein_Vazirani{1..14}.aut`, `Grover{2..10}.aut/.lsta`
+  - `artifact_evaluation.sh`: reference evaluation script
+- `demo/`: Demo verification scenarios from `AutoQ/demo/`
+  - `BernsteinVazirani/`, `GroverIteration/`, `MultipleBernsteinVazirani-separate/`, `MultipleBernsteinVazirani-together/`
+  - Each contains `circuit.qasm`, `pre.hsl`, `post.hsl`
 
 ## Next Steps (Priority Order)
 1. Port HSL parser from prototype (adapt for generic Automata<S>)
