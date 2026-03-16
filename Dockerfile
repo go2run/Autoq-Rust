@@ -2,7 +2,7 @@
 # Build: docker build "https://github.com/go2run/Autoq-Rust.git#claude/autoq-rust-analysis-R36fZ"
 # Run:   docker run --rm -it <image>
 
-FROM rust:1.75-bookworm AS builder
+FROM rust:1.85-bookworm AS builder
 
 WORKDIR /app
 COPY . .
