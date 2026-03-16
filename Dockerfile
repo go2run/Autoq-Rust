@@ -1,21 +1,16 @@
-# AutoQ-Rust: Automata-based quantum program verification
-# Build: docker build "https://github.com/go2run/Autoq-Rust.git#claude/autoq-rust-analysis-R36fZ"
-# Run:   docker run --rm -it <image>
+# AutoQ-Rust Development Environment
+# Build: docker build "https://github.com/go2run/Autoq-Rust.git#claude/autoq-rust-analysis-R36fZ" -t autoq-rust
+# Run:   docker run --rm -it autoq-rust
 
-FROM rust:1.85-bookworm AS builder
+FROM rust:1.85-bookworm
 
-WORKDIR /app
+WORKDIR /home/user/Autoq-Rust
+
 COPY . .
 
 RUN cargo build --release -p autoq-cli && \
     cargo test --release
 
-FROM debian:bookworm-slim
+ENV PATH="/home/user/Autoq-Rust/target/release:${PATH}"
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends libgcc-s1 && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY --from=builder /app/target/release/autoq /usr/local/bin/autoq
-
-ENTRYPOINT ["autoq"]
+CMD ["bash"]
