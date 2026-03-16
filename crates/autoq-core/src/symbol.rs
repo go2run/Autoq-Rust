@@ -63,6 +63,9 @@ pub trait SymbolTrait: Clone + Eq + Ord + Hash + fmt::Debug + fmt::Display + Sen
     /// Get a reference to the leaf amplitude. Panics if called on an internal node.
     fn complex(&self) -> &Self::Complex;
 
+    /// Get a mutable reference to the leaf amplitude. Panics if called on an internal node.
+    fn complex_mut(&mut self) -> &mut Self::Complex;
+
     /// Consume and return the leaf amplitude. Panics if called on an internal node.
     fn into_complex(self) -> Self::Complex;
 
@@ -169,6 +172,13 @@ impl SymbolTrait for ConcreteSymbol {
         match self {
             ConcreteSymbol::Leaf(ft) => ft,
             ConcreteSymbol::Internal(_) => panic!("Internal symbols do not have complex()"),
+        }
+    }
+
+    fn complex_mut(&mut self) -> &mut FiveTuple {
+        match self {
+            ConcreteSymbol::Leaf(ft) => ft,
+            ConcreteSymbol::Internal(_) => panic!("Internal symbols do not have complex_mut()"),
         }
     }
 

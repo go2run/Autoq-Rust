@@ -138,6 +138,10 @@ pub fn is_included_in<S: SymbolTrait>(aut_a: &Automata<S>, aut_b: &Automata<S>) 
 
                 if sym_a.is_internal() && children_a.len() == 2 {
                     for (pos, &child_a) in children_a.iter().enumerate() {
+                        // If child_a has no transitions at all, it's a dead state.
+                        // No trees can be produced through it, so this obligation
+                        // is vacuously satisfied.
+                        if !trans_a.contains_key(&child_a) { continue; }
                         let child_b_set: BTreeSet<State> = matching_b.iter()
                             .filter_map(|bc| bc.get(pos).copied())
                             .collect();

@@ -222,26 +222,40 @@ impl Automata<ConcreteSymbol> {
         let tag: Tag = 1;
 
         // Create leaf states
-        let leaf_one = aut.new_state();
-        let leaf_zero = aut.new_state();
+        let leaf_one = aut.new_state();  // amplitude 1 (|0⟩ path)
+        let leaf_zero = aut.new_state(); // amplitude 0 (|1⟩ path)
         aut.add_transition(ConcreteSymbol::leaf(FiveTuple::one()), tag, leaf_one, vec![]);
         aut.add_transition(ConcreteSymbol::leaf(FiveTuple::zero()), tag, leaf_zero, vec![]);
 
-        // Build tree bottom-up: each qubit level branches |0⟩→(child, leaf_zero) |1⟩→impossible
-        // Actually: internal node at depth q has children [left=next_level, right=leaf_zero]
-        // except the deepest level where left=leaf_one
-        let mut current = leaf_one;
+        // Build tree bottom-up. For the product construction in general_single_qubit_gate
+        // to work correctly, children at each qubit level must have transitions at the
+        // next level (not be bare leaves). So we create a "dead" internal state at each
+        // qubit level whose both children go to leaf_zero (or to the dead state at the
+        // next level).
+        let mut child_live = leaf_one;  // the |00...0⟩ path
+        let mut child_dead = leaf_zero; // the "amplitude 0" path
+
         for q in (1..=n).rev() {
-            let parent = aut.new_state();
+            let live_parent = aut.new_state();
             aut.add_transition(
                 ConcreteSymbol::internal(q as i64),
-                tag, parent,
-                vec![current, leaf_zero],
+                tag, live_parent,
+                vec![child_live, child_dead],
             );
-            current = parent;
+
+            // Create dead internal state: both children go to dead
+            let dead_parent = aut.new_state();
+            aut.add_transition(
+                ConcreteSymbol::internal(q as i64),
+                tag, dead_parent,
+                vec![child_dead, child_dead],
+            );
+
+            child_live = live_parent;
+            child_dead = dead_parent;
         }
 
-        aut.final_states.push(current);
+        aut.final_states.push(child_live);
         aut
     }
 
