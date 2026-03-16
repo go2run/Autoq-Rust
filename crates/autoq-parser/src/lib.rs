@@ -3,8 +3,8 @@
 //! ## Modules
 //! - `hsl`: Extended Dirac notation parser (replaces ANTLR4)
 //! - `timbuk`: Timbuk format serialization/deserialization
-//! - `qasm`: OpenQASM 2.0/3.0 parser (TODO)
+//! - `qasm`: OpenQASM 2.0 line-by-line gate executor
 
 pub mod hsl;
 pub mod timbuk;
-// pub mod qasm; // TODO: implement QASM parser
+pub mod qasm;

@@ -1,0 +1,116 @@
+// HSL (High-level Specification Language) grammar for AutoQ
+//
+// Supports the most common formats found in benchmarks:
+//
+// Format 1 — single state with braces:
+//   Constants
+//   c1 := 1
+//   Extended Dirac
+//   {c1 |00101>}
+//
+// Format 2 — set of states with braces (nondeterministic):
+//   Extended Dirac
+//   {|00>, |01>, 1/sqrt2 |00> + 1/sqrt2 |01>}
+//
+// Format 3 — bare states without braces (one per line):
+//   Constants
+//   vH := 1
+//   Extended Dirac
+//   vH |000>
+//
+// Format 4 — multi-line bare states (each line is a state):
+//   Extended Dirac
+//   vH |0000000> + vL |0001000>
+//   vL |0100000> + vH |0101000>
+//
+// Note: Symbolic kets, sum quantifiers, and Constraints require Z3.
+
+WHITESPACE = _{ " " | "\t" }
+NEWLINE    = _{ "\n" | "\r\n" | "\r" }
+COMMENT    = _{ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+
+// ─── Primitives ─────────────────────────────────────────────────────────────
+
+uint = @{ ASCII_DIGIT+ }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+bit = @{ "0" | "1" }
+ket = { "|" ~ bit+ ~ ">" }
+
+// ─── Amplitude expressions ──────────────────────────────────────────────────
+
+sqrt2_power = { "(" ~ "sqrt2" ~ "^" ~ uint ~ ")" }
+
+rational_amp = {
+    uint ~ "/" ~ sqrt2_power
+  | uint ~ "/" ~ uint
+}
+
+inv_sqrt2_lit = { "1/sqrt2" }
+half_lit       = { "1/2" }
+
+amp_value = {
+    inv_sqrt2_lit
+  | half_lit
+  | rational_amp
+  | identifier
+  | uint
+}
+
+// ─── HSL term (amplitude * ket) ─────────────────────────────────────────────
+
+sign = { "+" | "-" }
+
+term = { amp_value? ~ WHITESPACE* ~ ket }
+
+state_expr = { term ~ (WHITESPACE* ~ sign ~ WHITESPACE* ~ term)* }
+
+// ─── Constants section ───────────────────────────────────────────────────────
+
+const_def = {
+    identifier ~ WHITESPACE* ~ ":=" ~ WHITESPACE* ~ amp_value ~ NEWLINE+
+}
+
+constants_section = {
+    "Constants" ~ NEWLINE+ ~ const_def+
+}
+
+// ─── Constraints section (parsed but not evaluated without Z3) ──────────────
+
+constraint_line = @{ (!NEWLINE ~ ANY)+ }
+
+constraints_section = {
+    "Constraints" ~ NEWLINE+ ~ (constraint_line ~ NEWLINE*)+
+}
+
+// ─── Extended Dirac section ─────────────────────────────────────────────────
+
+// Braced set: {state1, state2, ...}
+dirac_set = {
+    "{" ~ WHITESPACE* ~ NEWLINE*
+    ~ state_expr
+    ~ (WHITESPACE* ~ "," ~ WHITESPACE* ~ NEWLINE* ~ state_expr)*
+    ~ WHITESPACE* ~ NEWLINE* ~ "}"
+}
+
+// Bare states: one state_expr per line (no braces)
+dirac_bare = {
+    state_expr ~ (NEWLINE+ ~ state_expr)*
+}
+
+dirac_section = {
+    "Extended Dirac" ~ NEWLINE+ ~ (dirac_set | dirac_bare)
+}
+
+// ─── Top-level file ─────────────────────────────────────────────────────────
+
+file = {
+    SOI
+    ~ NEWLINE*
+    ~ constants_section?
+    ~ NEWLINE*
+    ~ dirac_section
+    ~ NEWLINE*
+    ~ constraints_section?
+    ~ NEWLINE*
+    ~ EOI
+}
